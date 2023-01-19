@@ -27,10 +27,16 @@ public class EmployeeController {
 			
 			switch(select) {
 			case 1:
-				ar = employeeDAO.getList();
-				employeeView.view(ar);
+				employeeDAO.getList();
 				break;
-			
+			case 2:
+				System.out.println("사원 번호 입력");
+				select = sc.nextInt();
+				employeeDAO.getDetail(select);
+				break;
+			case 3:
+				
+				break;
 			default:
 				check = false;
 			}
