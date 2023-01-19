@@ -16,9 +16,9 @@ public class JDBCMain {
 		EmployeeController ec = new EmployeeController();
 		
 		try {
-			//dc.start();
+			dc.start();
 			//lc.start();
-			ec.start();
+			//ec.start();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
