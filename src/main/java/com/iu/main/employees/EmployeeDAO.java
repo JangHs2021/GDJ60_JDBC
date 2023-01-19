@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import com.iu.main.util.DBConnection;
 
 public class EmployeeDAO {
-
+	
 	public ArrayList<EmployeeDTO> getList() throws Exception {
 		ArrayList<EmployeeDTO> ar = new ArrayList<EmployeeDTO>();
 		
@@ -23,7 +23,7 @@ public class EmployeeDAO {
 		
 		while(rs.next()) {
 			EmployeeDTO employeeDTO = new EmployeeDTO();
-			employeeDTO.setDepartment_id(rs.getInt("EMPLOYEE_ID"));
+			employeeDTO.setEmployee_id(rs.getInt("EMPLOYEE_ID"));
 			employeeDTO.setFirst_name(rs.getString("FIRST_NAME"));
 			employeeDTO.setLast_name(rs.getString("LAST_NAME"));
 			employeeDTO.setJob_id(rs.getString("JOB_ID"));
@@ -35,21 +35,19 @@ public class EmployeeDAO {
 		return ar;
 	}
 	
-	public EmployeeDTO getDetail(int emplotee_id) throws Exception {
-		EmployeeDTO employeeDTO = null;
+	public EmployeeDTO getDetail(EmployeeDTO employeeDTO) throws Exception {
 		Connection connection = DBConnection.getConnection();
 		
 		String sql = "SELECT * FROM EMPLOYEES WHERE EMPLOYEE_ID = ?";
 		
 		PreparedStatement st = connection.prepareStatement(sql);
 		
-		st.setString(1, "%"+ emplotee_id + "%");
+		st.setInt(1, employeeDTO.getEmployee_id());
 		
 		ResultSet rs = st.executeQuery();
 		
 		if(rs.next()) {
-			employeeDTO = new EmployeeDTO();
-			employeeDTO.setDepartment_id(rs.getInt("EMPLOYEE_ID"));
+			employeeDTO.setEmployee_id(rs.getInt("EMPLOYEE_ID"));
 			employeeDTO.setFirst_name(rs.getString("FIRST_NAME"));
 			employeeDTO.setLast_name(rs.getString("LAST_NAME"));
 			employeeDTO.setEmail(rs.getString("EMAIL"));
@@ -66,22 +64,21 @@ public class EmployeeDAO {
 		return employeeDTO;
 	}
 	
-	public ArrayList<EmployeeDTO> getFind(String search) throws Exception {
+	public ArrayList<EmployeeDTO> getFind(EmployeeDTO employeeDTO) throws Exception {
 		ArrayList<EmployeeDTO> ar = new ArrayList<EmployeeDTO>();
 		
 		Connection connection = DBConnection.getConnection();
 		
-		String sql = "SELECT * FROM EMPLOYEES WHERE LAST_NAME LIKE '%'||?||'%'";
+		String sql = "SELECT * FROM EMPLOYEES WHERE LAST_NAME LIKE ?";
 		
 		PreparedStatement st = connection.prepareStatement(sql);
 		
-		st.setString(1, search);
+		st.setString(1, "%" + employeeDTO.getLast_name() + "%");
 		
 		ResultSet rs = st.executeQuery();
 		
 		while(rs.next()) {
-			EmployeeDTO employeeDTO = new EmployeeDTO();
-			employeeDTO.setDepartment_id(rs.getInt("EMPLOYEE_ID"));
+			employeeDTO.setEmployee_id(rs.getInt("EMPLOYEE_ID"));
 			employeeDTO.setFirst_name(rs.getString("FIRST_NAME"));
 			employeeDTO.setLast_name(rs.getString("LAST_NAME"));
 			employeeDTO.setEmail(rs.getString("EMAIL"));
@@ -98,5 +95,64 @@ public class EmployeeDAO {
 		DBConnection.disConnect(rs, st, connection);
 		
 		return ar;
+	}
+	
+	// HIRE_DATE = sysdate, EMPLOYEE_ID = SEQ
+	public int insertData(EmployeeDTO employeeDTO) throws Exception {
+		Connection connection = DBConnection.getConnection();
+		
+		String sql = "INSERT INTO EMPLOYEES (EMPLOYEE_ID, FIRST_NAME, LAST_NAME, EMAIL, PHONE_NUMBER, HIRE_DATE, JOB_ID, SALARY, COMMISSION_PCT, MANAGER_ID, DEPARTMENT_ID)"
+				+ " VALUES (EMPLOYEES_SEQ.NEXTVAL, ?, ?, ?, ?, SYSDATE, ?, ?, ?, ?, ?)";
+		
+		PreparedStatement st = connection.prepareStatement(sql);
+		
+		st.setString(1, employeeDTO.getFirst_name());
+		st.setString(2, employeeDTO.getLast_name());
+		st.setString(3, employeeDTO.getEmail());
+		st.setString(4, employeeDTO.getPhone_number());
+		st.setString(5, employeeDTO.getJob_id());
+		st.setDouble(6, employeeDTO.getSalary());
+		st.setDouble(7, employeeDTO.getCommission_pct());
+		st.setInt(8, employeeDTO.getManager_id());
+		st.setInt(9, employeeDTO.getDepartment_id());
+		
+		int result = st.executeUpdate();
+		
+		DBConnection.disConnect(st, connection);
+		
+		return result;
+	}
+	
+	public int deleteData(EmployeeDTO employeeDTO) throws Exception {
+		Connection connection = DBConnection.getConnection();
+		
+		String sql = "DELETE EMPLOYEES WHERE EMPLOYEE_ID = ?";
+		
+		PreparedStatement st = connection.prepareStatement(sql);
+		
+		st.setInt(1, employeeDTO.getEmployee_id());
+		
+		int result = st.executeUpdate();
+		
+		DBConnection.disConnect(st, connection);
+		
+		return result;
+	}
+	
+	public int updateData(EmployeeDTO employeeDTO) throws Exception {
+		Connection connection = DBConnection.getConnection();
+		
+		String sql = "UPDATE EMPLOYEES SET MANAGER_ID = ? WHERE DEPARTMENT_ID = ?";
+		
+		PreparedStatement st = connection.prepareStatement(sql);
+		
+		st.setInt(1, employeeDTO.getManager_id());
+		st.setInt(2, employeeDTO.getDepartment_id());
+		
+		int result = st.executeUpdate();
+		
+		DBConnection.disConnect(st, connection);
+		
+		return result;
 	}
 }

@@ -11,10 +11,11 @@ import com.iu.main.util.DBConnection;
 public class LocationDAO {
 	
 	public ArrayList<LocationDTO> getFind(String search) throws Exception {
-		Connection connection = DBConnection.getConnection();
 		LocationDTO locationDTO = null;
 		ArrayList<LocationDTO> ar = new ArrayList<LocationDTO>();
 		
+		Connection connection = DBConnection.getConnection();
+
 		String sql = "SELECT * FROM LOCATIONS WHERE STREET_ADDRESS LIKE ?";
 		
 		PreparedStatement st = connection.prepareStatement(sql);
@@ -98,5 +99,62 @@ public class LocationDAO {
 		DBConnection.disConnect(rs, st, connection);
 		
 		return ar;
+	}
+	
+	public int setData(LocationDTO locationDTO) throws Exception {
+		Connection connection = DBConnection.getConnection();
+		
+		String sql = "INSERT INTO LOCATIONS (LOCATION_ID, STREET_ADDRESS, POSTAL_CODE, CITY, STATE_PROVINCE, COUNTRY_ID)"
+				+ " VALUES (LOCATIONS_SEQ.NEXTVAL, ?, ?, ?, ?, ?)";
+	
+		PreparedStatement st = connection.prepareStatement(sql);
+		
+		st.setString(1, locationDTO.getStreet_address());
+		st.setString(2, locationDTO.getPostal_code());
+		st.setString(3, locationDTO.getCity());
+		st.setString(4, locationDTO.getState_province());
+		st.setString(5, locationDTO.getCountry_id());
+		
+		int result = st.executeUpdate();
+		
+		DBConnection.disConnect(st, connection);
+		
+		return result;
+	}
+	
+	public int deleteData(LocationDTO locationDTO) throws Exception {
+		Connection connection = DBConnection.getConnection();
+		
+		String sql = "DELETE LOCATIONS WHERE LOCATION_ID = ?";
+		
+		PreparedStatement st = connection.prepareStatement(sql);
+		
+		st.setInt(1, locationDTO.getLocation_id());
+		
+		int result = st.executeUpdate();
+		
+		DBConnection.disConnect(st, connection);
+		
+		return result;
+	}
+	
+	// address postal_code
+	public int updateData(LocationDTO locationDTO) throws Exception {
+		Connection connection = DBConnection.getConnection();
+		
+		String sql = "UPDATE LOCATIONS SET STREET_ADDRESS = ?, POSTAL_CODE = ?"
+				+ " WHERE LOCATION_ID = ?";
+		
+		PreparedStatement st = connection.prepareStatement(sql);
+		
+		st.setString(1, locationDTO.getStreet_address());
+		st.setString(2, locationDTO.getPostal_code());
+		st.setInt(3, locationDTO.getLocation_id());
+		
+		int result = st.executeUpdate();
+		
+		DBConnection.disConnect(st, connection);
+		
+		return result;
 	}
 }
