@@ -34,6 +34,8 @@ public class EmployeeInput {
 		employeeDTO.setEmail(sc.next());
 		System.out.println("추가할 전화번호 입력");
 		employeeDTO.setPhone_number(sc.next());
+		System.out.println("추가할 날짜 입력");
+		employeeDTO.setHire_date(sc.next());
 		System.out.println("추가할 직급 입력");
 		employeeDTO.setJob_id(sc.next());
 		System.out.println("추가할 월급 입력");
